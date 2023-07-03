@@ -33,8 +33,8 @@ init_var() {
   DOMAIN_FILE="/tpdata2/caddy/domain.lock"
   CADDY_CERT_DIR="/tpdata2/caddy/cert/certificates/acme-v02.api.letsencrypt.org-directory/"
   domain=""
-  caddy_port=8080
-  caddy_remote_port=8864
+  caddy_port=80
+  caddy_remote_port=8863
   your_email=""
   ssl_option=1
   ssl_module_type=1
@@ -45,14 +45,14 @@ init_var() {
   # MariaDB
   MARIA_DATA="/tpdata2/mariadb/"
   mariadb_ip="127.0.0.1"
-  mariadb_port=9508
+  mariadb_port=9507
   mariadb_user="root"
   mariadb_pas=""
 
   #Redis
   REDIS_DATA="/tpdata2/redis/"
   redis_host="127.0.0.1"
-  redis_port=6379
+  redis_port=6378
   redis_pass=""
 
   # Trojan Panel
@@ -65,7 +65,7 @@ init_var() {
   # Nginx
   NGINX_DATA="/tpdata2/nginx/"
   NGINX_CONFIG="/tpdata2/nginx/default.conf"
-  trojan_panel_ui_port=7777
+  trojan_panel_ui_port=8888
   https_enable=1
 
   # Trojan Panel Core
@@ -74,7 +74,7 @@ init_var() {
   TROJAN_PANEL_CORE_SQLITE="/tpdata2/trojan-panel-core/config/sqlite/"
   database="trojan_panel_db"
   account_table="account"
-  grpc_port=8101
+  grpc_port=8100
 
   # Update
   trojan_panel_current_version=""
@@ -273,9 +273,9 @@ install_caddy_tls() {
     wget --no-check-certificate -O ${CADDY_DATA}html.tar.gz ${STATIC_HTML} &&
       tar -zxvf ${CADDY_DATA}html.tar.gz -C ${CADDY_SRV}
 
-    read -r -p "请输入Caddy的端口(默认:8080): " caddy_port
+    read -r -p "请输入Caddy的端口(默认:80): " caddy_port
     [[ -z "${caddy_port}" ]] && caddy_port=80
-    read -r -p "请输入Caddy的转发端口(默认:8864): " caddy_remote_port
+    read -r -p "请输入Caddy的转发端口(默认:8863): " caddy_remote_port
     [[ -z "${caddy_remote_port}" ]] && caddy_remote_port=8863
 
     echo_content yellow "提示：请确认域名已经解析到本机 否则可能安装失败"
@@ -625,7 +625,7 @@ install_mariadb() {
     echo_content green "---> 安装MariaDB"
 
     read -r -p "请输入数据库的端口(默认:9507): " mariadb_port
-    [[ -z "${mariadb_port}" ]] && mariadb_port=9508
+    [[ -z "${mariadb_port}" ]] && mariadb_port=9507
     read -r -p "请输入数据库的用户名(默认:root): " mariadb_user
     [[ -z "${mariadb_user}" ]] && mariadb_user="root"
     while read -r -p "请输入数据库的密码(必填): " mariadb_pas; do
@@ -683,7 +683,7 @@ install_redis() {
     echo_content green "---> 安装Redis"
 
     read -r -p "请输入Redis的端口(默认:6378): " redis_port
-    [[ -z "${redis_port}" ]] && redis_port=6379
+    [[ -z "${redis_port}" ]] && redis_port=6378
     while read -r -p "请输入Redis的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
@@ -718,7 +718,7 @@ install_trojan_panel() {
     read -r -p "请输入数据库的IP地址(默认:本机数据库): " mariadb_ip
     [[ -z "${mariadb_ip}" ]] && mariadb_ip="127.0.0.1"
     read -r -p "请输入数据库的端口(默认:9507): " mariadb_port
-    [[ -z "${mariadb_port}" ]] && mariadb_port=9508
+    [[ -z "${mariadb_port}" ]] && mariadb_port=9507
     read -r -p "请输入数据库的用户名(默认:root): " mariadb_user
     [[ -z "${mariadb_user}" ]] && mariadb_user="root"
     while read -r -p "请输入数据库的密码(必填): " mariadb_pas; do
@@ -734,7 +734,7 @@ install_trojan_panel() {
     read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
     [[ -z "${redis_host}" ]] && redis_host="127.0.0.1"
     read -r -p "请输入Redis的端口(默认:6378): " redis_port
-    [[ -z "${redis_port}" ]] && redis_port=6379
+    [[ -z "${redis_port}" ]] && redis_port=6378
     while read -r -p "请输入Redis的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
@@ -834,7 +834,7 @@ server {
     }
 
     location /api {
-        proxy_pass http://127.0.0.1:8082;
+        proxy_pass http://127.0.0.1:8081;
     }
 
     error_page  497              http://\$host:${trojan_panel_ui_port}\$uri?\$args;
@@ -887,7 +887,7 @@ install_trojan_panel_core() {
     read -r -p "请输入数据库的IP地址(默认:本机数据库): " mariadb_ip
     [[ -z "${mariadb_ip}" ]] && mariadb_ip="127.0.0.1"
     read -r -p "请输入数据库的端口(默认:9507): " mariadb_port
-    [[ -z "${mariadb_port}" ]] && mariadb_port=9508
+    [[ -z "${mariadb_port}" ]] && mariadb_port=9507
     read -r -p "请输入数据库的用户名(默认:root): " mariadb_user
     [[ -z "${mariadb_user}" ]] && mariadb_user="root"
     while read -r -p "请输入数据库的密码(必填): " mariadb_pas; do
@@ -905,7 +905,7 @@ install_trojan_panel_core() {
     read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
     [[ -z "${redis_host}" ]] && redis_host="127.0.0.1"
     read -r -p "请输入Redis的端口(默认:6378): " redis_port
-    [[ -z "${redis_port}" ]] && redis_port=6379
+    [[ -z "${redis_port}" ]] && redis_port=6378
     while read -r -p "请输入Redis的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
@@ -913,8 +913,8 @@ install_trojan_panel_core() {
         break
       fi
     done
-    read -r -p "请输入API的端口(默认:8101): " grpc_port
-    [[ -z "${grpc_port}" ]] && grpc_port=8101
+    read -r -p "请输入API的端口(默认:8100): " grpc_port
+    [[ -z "${grpc_port}" ]] && grpc_port=8100
 
     domain=$(cat "${DOMAIN_FILE}")
 
@@ -1018,8 +1018,8 @@ update_trojan_panel() {
 
     read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
     [[ -z "${redis_host}" ]] && redis_host="127.0.0.1"
-    read -r -p "请输入Redis的端口(默认:6379): " redis_port
-    [[ -z "${redis_port}" ]] && redis_port=6379
+    read -r -p "请输入Redis的端口(默认:6378): " redis_port
+    [[ -z "${redis_port}" ]] && redis_port=6378
     while read -r -p "请输入Redis的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
@@ -1099,7 +1099,7 @@ update_trojan_panel_core() {
     read -r -p "请输入数据库的IP地址(默认:本机数据库): " mariadb_ip
     [[ -z "${mariadb_ip}" ]] && mariadb_ip="127.0.0.1"
     read -r -p "请输入数据库的端口(默认:9507): " mariadb_port
-    [[ -z "${mariadb_port}" ]] && mariadb_port=9508
+    [[ -z "${mariadb_port}" ]] && mariadb_port=9507
     read -r -p "请输入数据库的用户名(默认:root): " mariadb_user
     [[ -z "${mariadb_user}" ]] && mariadb_user="root"
     while read -r -p "请输入数据库的密码(必填): " mariadb_pas; do
@@ -1117,7 +1117,7 @@ update_trojan_panel_core() {
     read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
     [[ -z "${redis_host}" ]] && redis_host="127.0.0.1"
     read -r -p "请输入Redis的端口(默认:6378): " redis_port
-    [[ -z "${redis_port}" ]] && redis_port=6379
+    [[ -z "${redis_port}" ]] && redis_port=6378
     while read -r -p "请输入Redis的密码(必填): " redis_pass; do
       if [[ -z "${redis_pass}" ]]; then
         echo_content red "密码不能为空"
@@ -1307,8 +1307,8 @@ redis_flush_all() {
 
   read -r -p "请输入Redis的IP地址(默认:本机Redis): " redis_host
   [[ -z "${redis_host}" ]] && redis_host="127.0.0.1"
-  read -r -p "请输入Redis的端口(默认:6379): " redis_port
-  [[ -z "${redis_port}" ]] && redis_port=6379
+  read -r -p "请输入Redis的端口(默认:6378): " redis_port
+  [[ -z "${redis_port}" ]] && redis_port=6378
   while read -r -p "请输入Redis的密码(必填): " redis_pass; do
     if [[ -z "${redis_pass}" ]]; then
       echo_content red "密码不能为空"
